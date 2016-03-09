@@ -1,5 +1,5 @@
-#ifndef LTTO_IR_H
-#define LTTO_IR_H
+#ifndef LTTO_IR_STORAGE_RAW_H
+#define LTTO_IR_STORAGE_RAW_H
 
 #include "stdint.h"
 
@@ -28,7 +28,7 @@ enum class eLTTO_IR_SFP {
 	LONG = 0x02
 };
 
-typedef struct LTTO_IR {
+typedef struct LTTO_IR_STORAGE {
     //This is a raw LTTO IR packet, with all the nitty gritty details.
 	eLTTO_IR_HEADERTYPE headerType;                         //Which header type is associated with this signature
 	eLTTO_IR_BITCOUNT bitCount;                             //How many bits are associated with this signature
@@ -37,8 +37,8 @@ typedef struct LTTO_IR {
 
 	void reset(void);                                       //Sets the above to NORMAL, FIVE, SHORT and 0, respectively.
 
-	LTTO_IR& operator= (const LTTO_IR_SIGNATURE& from);     //Used for converting an LTTO_IR_SIGNATURE to an LTTO_IR
+	LTTO_IR_STORAGE& operator= (const LTTO_IR_SIGNATURE& from);     //Used for converting an LTTO_IR_SIGNATURE to an LTTO_IR
 	bool convertTo(LTTO_IR_SIGNATURE *output);              //Used for converting an LTTO_IR to an LTTO_IR_SIGNATURE.
-} LTTO_IR;
+} LTTO_IR_STORAGE;
 
 #endif

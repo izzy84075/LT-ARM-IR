@@ -1,13 +1,13 @@
-#include "LTTO_IR.hpp"
+#include "LTTO_IR_Storage_Raw.hpp"
 
-void LTTO_IR::reset(void) {
+void LTTO_IR_STORAGE::reset(void) {
     headerType = eLTTO_IR_HEADERTYPE::NORMAL;
     bitCount = eLTTO_IR_BITCOUNT::FIVE;
     SFP = eLTTO_IR_SFP::SHORT;
     data = 0;
 }
 
-LTTO_IR& LTTO_IR::operator=(const LTTO_IR_SIGNATURE& from) {
+LTTO_IR_STORAGE& LTTO_IR_STORAGE::operator=(const LTTO_IR_SIGNATURE& from) {
     data = 0;
     switch(from.sigType) {
         case eLTTO_IR_SIGNATURETYPE::LTTO_BEACON:
@@ -50,7 +50,7 @@ LTTO_IR& LTTO_IR::operator=(const LTTO_IR_SIGNATURE& from) {
     return *this;
 }
 
-bool LTTO_IR::convertTo(LTTO_IR_SIGNATURE *output) {
+bool LTTO_IR_STORAGE::convertTo(LTTO_IR_SIGNATURE *output) {
     switch(headerType) {
         case eLTTO_IR_HEADERTYPE::NORMAL:
             //Tag, multibyte PType, multibyte data, or multibyte CSum

@@ -1,10 +1,10 @@
-#include "LTTO_IRRX.hpp"
+#include "LTTO_IR_RX.hpp"
 
-LTTO_IRRX::LTTO_IRRX(void) {
+LTTO_IR_RX::LTTO_IR_RX(void) {
 	reset();
 }
 
-void LTTO_IRRX::Tick1ms(void) {
+void LTTO_IR_RX::Tick1ms(void) {
 	if(multibyteBuffer.size && !multibyteComplete) {
 		//If we've started receiving a multibyte packet and it's not complete, increment the age.
 		multibyteAge++;
@@ -16,13 +16,13 @@ void LTTO_IRRX::Tick1ms(void) {
 	}
 }
 
-void LTTO_IRRX::reset(void) {
+void LTTO_IR_RX::reset(void) {
 	RX.reset();
 	signatureBuffer.reset();
 	multibyteReset();
 }
 
-eLTTO_IRRX_PACKETREADY LTTO_IRRX::newSample(unsigned int qmsOn, unsigned int qmsOff) {
+eLTTO_IR_RX_PACKETREADY LTTO_IR_RX::newSample(unsigned int qmsOn, unsigned int qmsOff) {
 	if(RX.newSample(qmsOn, qmsOff)) {
 		//New raw packet
 		LTTO_IR_SIGNATURE temp;
@@ -78,21 +78,21 @@ eLTTO_IRRX_PACKETREADY LTTO_IRRX::newSample(unsigned int qmsOn, unsigned int qms
 	return signaturesWaiting();
 }
 
-eLTTO_IRRX_PACKETREADY LTTO_IRRX::signaturesWaiting(void) {
+eLTTO_IR_RX_PACKETREADY LTTO_IR_RX::signaturesWaiting(void) {
 	bool signature = (signatureBuffer.sigType != eLTTO_IR_SIGNATURETYPE::INVALID);
 
 	if(signature && multibyteComplete) {
-		return eLTTO_IRRX_PACKETREADY::BOTH;
+		return eLTTO_IR_RX_PACKETREADY::BOTH;
 	} else if(signature) {
-		return eLTTO_IRRX_PACKETREADY::SINGLE;
+		return eLTTO_IR_RX_PACKETREADY::SINGLE;
 	} else if(multibyteComplete) {
-		return eLTTO_IRRX_PACKETREADY::MULTIBYTE;
+		return eLTTO_IR_RX_PACKETREADY::MULTIBYTE;
 	} else {
-		return eLTTO_IRRX_PACKETREADY::NONE;
+		return eLTTO_IR_RX_PACKETREADY::NONE;
 	}
 }
 
-bool LTTO_IRRX::getSignature(LTTO_IR_SIGNATURE &output) {
+bool LTTO_IR_RX::getSignature(LTTO_IR_SIGNATURE &output) {
 	if(signatureBuffer.sigType != eLTTO_IR_SIGNATURETYPE::INVALID) {
 		output = signatureBuffer;
 		signatureBuffer.reset();
@@ -102,7 +102,7 @@ bool LTTO_IRRX::getSignature(LTTO_IR_SIGNATURE &output) {
 	return false;
 }
 
-bool LTTO_IRRX::getMultibyte(LTTO_IR_MULTIBYTE &output) {
+bool LTTO_IR_RX::getMultibyte(LTTO_IR_MULTIBYTE &output) {
 	if(multibyteComplete) {
 		output = multibyteBuffer;
 		multibyteReset();
@@ -112,7 +112,7 @@ bool LTTO_IRRX::getMultibyte(LTTO_IR_MULTIBYTE &output) {
 	return false;
 }
 
-void LTTO_IRRX::multibyteReset(void) {
+void LTTO_IR_RX::multibyteReset(void) {
 	multibyteBuffer.reset();
 	multibyteAge = 0;
 	multibyteComplete = false;

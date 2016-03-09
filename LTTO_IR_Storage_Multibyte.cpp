@@ -1,4 +1,4 @@
-#include "LTTO_IR_MULTIBYTE.hpp"
+#include "LTTO_IR_Storage_Multibyte.hpp"
 
 void LTTO_IR_MULTIBYTE::reset(void) {
     size = 0;

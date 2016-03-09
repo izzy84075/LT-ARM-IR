@@ -1,7 +1,7 @@
 #include "stdint.h"
 
-#ifndef LTTO_IR_MULTIBYTE_H
-#define LTTO_IR_MULTIBYTE_H
+#ifndef LTTO_IR_STORAGE_MULTIBYTE_H
+#define LTTO_IR_STORAGE_MULTIBYTE_H
 
 struct LTTO_IR_MULTIBYTE {
 	uint8_t data[22];               //A buffer for the data within the packet, including the packet type.

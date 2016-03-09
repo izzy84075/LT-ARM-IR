@@ -1,10 +1,10 @@
-#include "LTTO_IRTX.hpp"
+#include "LTTO_IR_TX.hpp"
 
-LTTO_IRTX::LTTO_IRTX() {
+LTTO_IR_TX::LTTO_IR_TX() {
 	reset();
 }
 
-void LTTO_IRTX::reset(void) {
+void LTTO_IR_TX::reset(void) {
 	timer = 0;
 	workingBuffer.reset();
 	multibyteBuffer.reset();
@@ -12,10 +12,10 @@ void LTTO_IRTX::reset(void) {
 	step = 0;
 	dataCounter = 0;
 	multibytePosition = 0;
-    LTTO_IRTX_update_IRLED(ePIN_STATE::LOW);
+	LTTO_IR_TX_update_IRLED(false);
 }
 
-void LTTO_IRTX::Tick1ms(void) {
+void LTTO_IR_TX::Tick1ms(void) {
 	if(timer) {
 		timer--;
 	}
@@ -25,7 +25,7 @@ void LTTO_IRTX::Tick1ms(void) {
 			case 0:
 				//PRE-SYNC
 				//3ms on
-				LTTO_IRTX_update_IRLED(ePIN_STATE::HIGH);
+				LTTO_IR_TX_update_IRLED(true);
 				timer = 3;
 
 				step++;
@@ -33,7 +33,7 @@ void LTTO_IRTX::Tick1ms(void) {
 			case 1:
 				//PRE-SYNC PAUSE
 				//6ms off
-				LTTO_IRTX_update_IRLED(ePIN_STATE::LOW);
+				LTTO_IR_TX_update_IRLED(false);
 				timer = 6;
 
 				step++;
@@ -41,7 +41,7 @@ void LTTO_IRTX::Tick1ms(void) {
 			case 2:
 				//SYNC
 				//3ms or 6ms on
-				LTTO_IRTX_update_IRLED(ePIN_STATE::HIGH);
+				LTTO_IR_TX_update_IRLED(true);
 				switch(workingBuffer.headerType) {
 					case eLTTO_IR_HEADERTYPE::NORMAL:
 						timer = 3;
@@ -72,7 +72,7 @@ void LTTO_IRTX::Tick1ms(void) {
 			case 3:
 				//Data bit pause
 				//2ms off
-				LTTO_IRTX_update_IRLED(ePIN_STATE::LOW);
+				LTTO_IR_TX_update_IRLED(false);
 				timer = 2;
 
 				step++;
@@ -80,7 +80,7 @@ void LTTO_IRTX::Tick1ms(void) {
 			case 4:
 				//Data bit
 				//1ms or 2ms on
-				LTTO_IRTX_update_IRLED(ePIN_STATE::HIGH);
+				LTTO_IR_TX_update_IRLED(true);
 
 				if(workingBuffer.data & 0x01) {
 					//This is a "One" bit
@@ -122,7 +122,7 @@ void LTTO_IRTX::Tick1ms(void) {
 				//Fall through into default: so that we can queue up another packet while waiting for the SFP to finish.
 			default:
 				//Either we just finished a packet or something went wrong. Turn the LED off(Just to be safe) and clean up.
-				LTTO_IRTX_update_IRLED(ePIN_STATE::LOW);
+				LTTO_IR_TX_update_IRLED(false);
 				busy = false;
 				workingBuffer.reset();
 				step = 0;
@@ -133,7 +133,7 @@ void LTTO_IRTX::Tick1ms(void) {
 	tryAdvancingMultibyte();
 }
 
-bool LTTO_IRTX::enqueue(eLTTO_IR_SIGNATURETYPE sigType, uint16_t data) {
+bool LTTO_IR_TX::enqueue(eLTTO_IR_SIGNATURETYPE sigType, uint16_t data) {
 	LTTO_IR_SIGNATURE temp;
 
 	temp.sigType = sigType;
@@ -142,26 +142,7 @@ bool LTTO_IRTX::enqueue(eLTTO_IR_SIGNATURETYPE sigType, uint16_t data) {
 	return enqueue(temp);
 }
 
-bool LTTO_IRTX::enqueue(LTTO_IR_SIGNATURE &signature) {
-	if(!isBusy()) {
-        workingBuffer = signature;
-        step = 0;
-        busy = true;
-        return true;
-	}
-	return false;
-}
-
-bool LTTO_IRTX::enqueue(LTTO_IR_MULTIBYTE &structure) {
-	if(!multibyteBuffer.size && structure.size) {
-		multibyteBuffer = structure;
-		tryAdvancingMultibyte();
-		return true;
-	}
-	return false;
-}
-
-bool LTTO_IRTX::enqueue(LTTO_IR &signature) {
+bool LTTO_IR_TX::enqueue(LTTO_IR_SIGNATURE &signature) {
 	if(!isBusy()) {
 		workingBuffer = signature;
 		step = 0;
@@ -171,14 +152,33 @@ bool LTTO_IRTX::enqueue(LTTO_IR &signature) {
 	return false;
 }
 
-bool LTTO_IRTX::isBusy(void) {
+bool LTTO_IR_TX::enqueue(LTTO_IR_MULTIBYTE &structure) {
+	if(!multibyteBuffer.size && structure.size) {
+		multibyteBuffer = structure;
+		tryAdvancingMultibyte();
+		return true;
+	}
+	return false;
+}
+
+bool LTTO_IR_TX::enqueue(LTTO_IR_STORAGE &signature) {
+	if(!isBusy()) {
+		workingBuffer = signature;
+		step = 0;
+		busy = true;
+		return true;
+	}
+	return false;
+}
+
+bool LTTO_IR_TX::isBusy(void) {
 	if(busy || multibyteBuffer.size) {
 		return true;
 	}
 	return false;
 }
 
-bool LTTO_IRTX::tryAdvancingMultibyte(void) {
+bool LTTO_IR_TX::tryAdvancingMultibyte(void) {
 	if(!busy && multibyteBuffer.size) {
 		if(multibytePosition == 0) {
 			enqueue(eLTTO_IR_SIGNATURETYPE::MULTIBYTE_PTYPE, multibyteBuffer.data[multibytePosition++]);

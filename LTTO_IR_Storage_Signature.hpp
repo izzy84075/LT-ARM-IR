@@ -1,7 +1,7 @@
 #include "stdint.h"
 
-#ifndef LTTO_IR_SIGNATURE_H
-#define LTTO_IR_SIGNATURE_H
+#ifndef LTTO_IR_STORAGE_SIGNATURE_H
+#define LTTO_IR_STORAGE_SIGNATURE_H
 
 enum class eLTTO_IR_SIGNATURETYPE {
 	LTTO_BEACON,
