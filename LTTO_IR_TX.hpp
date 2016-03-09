@@ -22,16 +22,16 @@ class LTTO_IR_TX {
 
 		bool isBusy(void);		//Will return true if the library is busy sending something, or false otherwise.
 	private:
-		LTTO_IR_STORAGE workingBuffer;
-		LTTO_IR_MULTIBYTE multibyteBuffer;
+		LTTO_IR_STORAGE workingBuffer;			//Working buffer for the currently-being-sent signature.
+		LTTO_IR_MULTIBYTE multibyteBuffer;		//Buffer for an in-progress multibyte packet. Each signature in this will be constructed and put into the workingBuffer as it comes up.
 
-		unsigned int timer;
-		unsigned int step;
-		unsigned int dataCounter;
-		unsigned int multibytePosition;
-		bool busy;
+		unsigned int timer;						//Decremented by Tick1ms(), used for delaying between pin toggles for a signature.
+		unsigned int step;						//Where we're currently at in the process of sending a signature.
+		unsigned int dataCounter;				//Which bit of the signature we're on.
+		unsigned int multibytePosition;			//Which byte of the multibyte message we're on.
+		bool busy;								//Whether or not we're currently sending something.
 
-		bool tryAdvancingMultibyte(void);
+		bool tryAdvancingMultibyte(void);		//Handles converting the multibyte buffer to individual signatures.
 };
 
 #endif

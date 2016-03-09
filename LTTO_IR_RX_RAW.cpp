@@ -139,7 +139,6 @@ LTTO_IR_STORAGE LTTO_IR_RX_RAW::getSignature(void) {
 }
 
 void LTTO_IR_RX_RAW::reset(void) {
-	raw = 0;
 	step = 0;
 	signatureWaiting = false;
 	workingBuffer.reset();
